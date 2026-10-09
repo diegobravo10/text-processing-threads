@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Informe Actividad 01</title>
+<style>
+  :root {
+    --fondo: #f3f6f4;
+    --papel: #fffefd;
+    --texto: #303b3a;
+    --principal: #5f7f7a;
+    --borde: #cbdad6;
+    --pastel-verde: #e3efeb;
+    --pastel-azul: #edf3f7;
+    --enlace: #426b70;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    max-width: 880px;
+    margin: 36px auto;
+    padding: 42px 54px;
+    color: var(--texto);
+    background: var(--papel);
+    border: 1px solid #e1e7e4;
+    border-radius: 8px;
+    box-shadow: 0 5px 18px rgba(61, 82, 78, 0.08);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  html { background: var(--fondo); }
+
+  h1 {
+    margin: 0 0 22px;
+    padding-bottom: 15px;
+    color: #456660;
+    border-bottom: 3px solid var(--borde);
+    font-size: 29px;
+    line-height: 1.25;
+  }
+
+  h2 {
+    margin: 34px 0 14px;
+    padding: 8px 12px;
+    color: #486861;
+    background: var(--pastel-verde);
+    border-left: 4px solid #8eafa7;
+    border-radius: 3px;
+    font-size: 20px;
+  }
+
+  p { margin: 0 0 14px; text-align: justify; }
+
+  a { color: var(--enlace); text-decoration-thickness: 1px; }
+  a:hover { color: #2f5054; }
+
+  table {
+    width: 100%;
+    margin: 18px 0 12px;
+    overflow: hidden;
+    border: 1px solid var(--borde);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 6px;
+    font-size: 15px;
+  }
+
+  th, td {
+    padding: 10px 12px;
+    border-right: 1px solid var(--borde);
+    border-bottom: 1px solid var(--borde);
+  }
+
+  th:last-child, td:last-child { border-right: 0; }
+  tr:last-child td { border-bottom: 0; }
+
+  th {
+    color: #374f4b;
+    background: #cfe2dc;
+    text-align: left;
+    font-weight: 600;
+  }
+
+
+  td.n { text-align: right; font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 700px) {
+    body { margin: 0; padding: 25px 20px; border: 0; border-radius: 0; }
+    h1 { font-size: 24px; }
+    table { display: block; overflow-x: auto; }
+  }
+
+  @media print {
+    html { background: #fff; }
+    body { max-width: none; margin: 0; padding: 0; border: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Actividad práctica 01 - Procesamiento secuencial y paralelo de textos con Java Threads</h1>
+<p>
+  <b>Estudiante:</b> Diego Bravo<br>
+  <b>Asignatura:</b> Computación Paralela<br>
+  <b>Repositorio:</b> <a href="#">https://github.com/diegobravo10/text-processing-threads.git</a>
+</p>
+
+<h2>1. Descripción de la solución</h2>
+<p>
+  El programa está hecho en Java y analiza el libro Don Quijote de la Mancha descargado de Project Gutenberg.
+  Primero se lee todo el archivo en memoria, se quita la cabecera y la licencia de Gutenberg (solo se deja lo
+  que está entre las marcas START y END) y se pasa todo el texto a minúsculas para que la búsqueda no
+  distinga mayúsculas de minúsculas. Esto se hace antes de empezar a medir tiempos.
+</p>
+<p>
+  Se calculan tres cosas: el total de palabras, cuántas veces aparece la palabra "quijote" y cuántas palabras
+  contienen la secuencia "ción". Se considera palabra a cualquier secuencia seguida de letras (usando
+  Character.isLetter, así se incluyen las tildes y la ñ); los espacios, signos de puntuación y números
+  separan las palabras.
+</p>
+<p>
+  La versión secuencial recorre el texto completo carácter por carácter en un solo hilo. La versión paralela
+  divide el texto en tantas partes como hilos. Para no cortar una palabra a la mitad, cada punto de corte se
+  mueve hacia adelante hasta encontrar un separador. Cada parte se asigna a un objeto de la clase
+  HiloAnalizador, que extiende de Thread y cuenta las palabras de su bloque. Se lanzan todos los hilos con
+  start(), se espera a que terminen con join() y al final se suman los resultados parciales de cada uno.
+  Como cada hilo guarda su propio resultado, no fue necesario usar sincronización.
+</p>
+<p>
+  Para medir se usó System.nanoTime(). Con 1 hilo se ejecuta la versión secuencial y con 2 y 4 hilos la
+  paralela. Cada caso se ejecutó 3 veces de calentamiento (para que la JVM compile el código) y después 5
+  veces medidas, de las que se sacó el promedio. La versión ampliada se generó repitiendo el texto original
+  100 veces en memoria.
+</p>
+<p>
+  Los resultados de la versión paralela coinciden con los de la secuencial. En el documento original se
+  obtuvieron 383 633 palabras, 2 241 apariciones de "quijote" y 950 palabras con "ción", tanto con 1 como
+  con 2 y 4 hilos. En el ampliado los valores son exactamente 100 veces esos números (38 363 300, 224 100 y
+  95 000), lo que indica que la división del texto no pierde ni repite palabras.
+</p>
+
+<h2>2. Características del equipo</h2>
+<p>
+  Las pruebas se hicieron en una laptop con procesador Intel Core Ultra 9 185H, que tiene 16 núcleos físicos
+  (6 de rendimiento, 8 de eficiencia y 2 de bajo consumo) y 22 hilos lógicos, con 32 GB de memoria RAM DDR5,
+  Windows 11 Home y Java 17 (JDK 17.0.12). El programa se ejecutó con la opción -Xmx2g para que alcance la
+  memoria con el texto ampliado.
+</p>
+
+<h2>3. Tabla de resultados</h2>
+<table>
+  <tr><th>Conjunto de datos</th><th>Hilos</th><th>Tiempo promedio (ms)</th><th>Aceleración</th></tr>
+  <tr><td>Original</td><td>1 (secuencial)</td><td class="n">9.067</td><td class="n">1.00</td></tr>
+  <tr><td>Original</td><td>2</td><td class="n">5.034</td><td class="n">1.80</td></tr>
+  <tr><td>Original</td><td>4</td><td class="n">3.769</td><td class="n">2.41</td></tr>
+  <tr><td>Ampliado</td><td>1 (secuencial)</td><td class="n">963.830</td><td class="n">1.00</td></tr>
+  <tr><td>Ampliado</td><td>2</td><td class="n">504.253</td><td class="n">1.91</td></tr>
+  <tr><td>Ampliado</td><td>4</td><td class="n">271.058</td><td class="n">3.56</td></tr>
+</table>
+
+
+<h2>4. Análisis de resultados</h2>
+
+<p><b>1. ¿Qué diferencias se observan entre los tiempos de ejecución secuencial y paralela?</b></p>
+<p>
+  En los dos casos la versión paralela fue más rápida que la secuencial. Con el documento original el tiempo
+  bajó de 9.07 ms a 5.03 ms con 2 hilos y a 3.77 ms con 4 hilos. Con el ampliado bajó de 963.8 ms a 504.3 ms
+  y 271.1 ms. Los conteos fueron los mismos en todas las ejecuciones, así que el paralelismo no afectó al
+  resultado.
+</p>
+
+<p><b>2. ¿Cómo influye el número de hilos en el rendimiento?</b></p>
+<p>
+  Al aumentar los hilos el tiempo baja, pero no en la misma proporción. Con 2 hilos la aceleración estuvo
+  cerca de 2 (1.80 y 1.91), pero con 4 hilos no se llegó a 4 (2.41 y 3.56). Esto pasa porque crear y esperar
+  los hilos tiene un costo, todos los hilos comparten la misma memoria y además el procesador tiene núcleos
+  de distinta velocidad, entonces el tiempo total depende del hilo que termina último. También probé con más
+  hilos sobre el texto original: con 8, 16 y 22 hilos el tiempo se quedó en unos 3 ms y con 44 hilos subió a
+  casi 5 ms, o sea que poner más hilos que núcleos ya no ayuda.
+</p>
+
+<p><b>3. ¿Qué sucede al incrementar el tamaño del documento?</b></p>
+<p>
+  El tiempo secuencial creció más o menos en proporción al tamaño (100 veces más texto tomó unas 106 veces
+  más tiempo). La aceleración mejoró bastante con el documento ampliado, sobre todo con 4 hilos, donde pasó
+  de 2.41 a 3.56. Con más datos cada hilo tiene más trabajo y el costo de crear los hilos casi no se nota,
+  mientras que con el original ese costo es una parte importante de los pocos milisegundos que dura.
+</p>
+
+<p><b>4. ¿El procesamiento paralelo siempre es más rápido? Justifique su respuesta.</b></p>
+<p>
+  No. Solo conviene cuando hay suficiente trabajo para repartir. Hice una prueba aparte con un pedazo de
+  2 000 caracteres del libro: la versión secuencial tardó unos 0.005 ms, mientras que con 2 hilos tardó
+  0.24 ms y con 4 hilos 0.57 ms, es decir, fue mucho más lenta. Con 20 000 caracteres pasó lo mismo (0.08 ms
+  secuencial contra 0.41 ms con 4 hilos). En esos casos casi todo el tiempo se va en crear y sincronizar los
+  hilos y no en procesar el texto. Además, usar más hilos que núcleos tampoco mejora el tiempo, y siempre hay
+  partes que no se pueden paralelizar, como dividir el texto y juntar los resultados.
+</p>
+
+<h2>5. Conclusiones</h2>
+<p>
+  El conteo de palabras se puede paralelizar fácilmente dividiendo los datos, porque cada bloque se procesa
+  de forma independiente y al final solo hay que sumar los resultados. Lo importante es dividir el texto en
+  un límite de palabra para que los resultados coincidan con los de la versión secuencial.
+</p>
+<p>
+  Con el documento ampliado se obtuvo una aceleración de 1.91 con 2 hilos y 3.56 con 4 hilos, que está cerca
+  del valor ideal. Con el documento original la mejora fue menor porque el texto es pequeño y el costo de
+  manejar los hilos pesa más. Por esto, el número de hilos se debe elegir según el tamaño de los datos y los
+  núcleos del equipo, ya que más hilos no siempre significa que el programa sea más rápido.
+</p>
+
+</body>
+</html>
