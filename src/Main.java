@@ -1,8 +1,6 @@
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Locale;
@@ -67,7 +65,6 @@ public class Main {
         }
 
         imprimirTabla(nombres, promedios, tiempos);
-        guardarCsv(Paths.get("resultados", "resultados.csv"), nombres, promedios, tiempos);
     }
 
   
@@ -115,26 +112,4 @@ public class Main {
         }
     }
 
-    private static void guardarCsv(Path ruta, String[] nombres, double[][] promedios,
-                                   double[][][] tiempos) throws IOException {
-        Files.createDirectories(ruta.getParent());
-        try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(ruta, StandardCharsets.UTF_8))) {
-            out.print("conjunto,hilos");
-            for (int rep = 0; rep < tiempos[0][0].length; rep++) {
-                out.print(",t" + (rep + 1) + "_ms");
-            }
-            out.println(",promedio_ms,aceleracion");
-            for (int d = 0; d < nombres.length; d++) {
-                for (int k = 0; k < HILOS.length; k++) {
-                    out.print(nombres[d] + "," + HILOS[k]);
-                    for (double t : tiempos[d][k]) {
-                        out.print(String.format(Locale.US, ",%.3f", t));
-                    }
-                    out.println(String.format(Locale.US, ",%.3f,%.2f",
-                            promedios[d][k], promedios[d][0] / promedios[d][k]));
-                }
-            }
-        }
-        System.out.println("\nResultados guardados en " + ruta);
-    }
 }

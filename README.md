@@ -1,7 +1,6 @@
 # Procesamiento secuencial y paralelo de textos con Java Threads
 
-Actividad práctica 01 de Computación Paralela. El programa analiza *Don Quijote de la Mancha*
-(Project Gutenberg, eBook #2000) y obtiene:
+Actividad práctica 01 de Computación Paralela. El programa analiza *Don Quijote de la Mancha*  y obtiene:
 
 1. El número total de palabras.
 2. El número de apariciones de una palabra (por defecto `quijote`).
@@ -20,7 +19,6 @@ La búsqueda no distingue mayúsculas de minúsculas. Se compara una implementac
 │   ├── ProcesadorParalelo.java  División en bloques + creación/start/join de hilos
 │   ├── HiloAnalizador.java      extends Thread, procesa un bloque
 │   └── Resultado.java           Conteos y combinación de resultados parciales
-├── resultados/resultados.csv    Tiempos generados por la última ejecución
 └── informe/informe.html         Informe de resultados
 ```
 
@@ -30,7 +28,7 @@ Desde la raíz del proyecto:
 
 ```bash
 javac -encoding UTF-8 -d out src/*.java
-java -Xmx2g -Dfile.encoding=UTF-8 -cp out Main
+java -Xmx2g -cp out Main
 ```
 
 `-Xmx2g` es necesario porque la versión ampliada (~215 millones de caracteres) se construye en memoria.
@@ -60,7 +58,7 @@ Ejemplo: `java -Xmx2g -cp out Main libro.txt sancho mente 10 100`
 3. Verifica que los resultados con 2 y 4 hilos coincidan con los del secuencial.
 4. Para 1 (secuencial), 2 y 4 hilos: 3 ejecuciones de calentamiento y 5 medidas con `System.nanoTime()`.
    Solo se mide el procesamiento.
-5. Imprime la tabla con el tiempo promedio y la aceleración (`S = Ts / Tp`) y la guarda en `resultados/resultados.csv`.
+5. Imprime en consola la tabla con el tiempo promedio y la aceleración (`S = Ts / Tp`).
 
 ## Criterios
 
@@ -70,7 +68,7 @@ Ejemplo: `java -Xmx2g -cp out Main libro.txt sancho mente 10 100`
 
 ## Resultados obtenidos
 
-Intel Core Ultra 9 185H (16 núcleos / 22 hilos), 32 GB RAM, JDK 17:
+Intel Core Ultra 9 185H (16 núcleos / 22 hilos), 32 GB RAM:
 
 | Conjunto | Hilos          | Tiempo promedio (ms) | Aceleración |
 |----------|----------------|---------------------:|------------:|
